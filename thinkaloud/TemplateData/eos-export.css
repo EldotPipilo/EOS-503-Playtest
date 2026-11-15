@@ -1,0 +1,107 @@
+@font-face {
+  font-family: EOSExportHeading;
+  src: url("export-theme/Audiowide-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: EOSExportBody;
+  src: url("export-theme/Roboto-Light.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+}
+.eos503-export-dialog.eos503-export-themed {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+  width: calc(100vw - 24px) !important;
+  height: calc(100vh - 24px) !important;
+  height: calc(100dvh - 24px) !important;
+  max-height: calc(100vh - 24px) !important;
+  max-height: calc(100dvh - 24px) !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column;
+  gap: clamp(10px, 2vmin, 24px);
+  overflow: auto !important;
+  padding: max(24px, 5vh) max(26px, 4vw) max(32px, 7vh) !important;
+  scroll-padding: max(24px, 5vh) max(26px, 4vw) max(32px, 7vh);
+  margin: 0 !important;
+  color: #d1e8e1 !important;
+  background: #2e4263 url("export-theme/panel.png") center / 100% 100% no-repeat !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: 0 0 0 100vmax rgb(7 19 31 / 86%);
+  font: 300 clamp(15px, 2.375vmin, 38px)/1.4 EOSExportBody, Arial, sans-serif !important;
+  text-align: center;
+  z-index: 2147483647 !important;
+}
+.eos503-export-themed .eos503-export-heading {
+  flex: 0 0 auto;
+  margin: 0;
+  color: #b8d6d0;
+  font: 400 clamp(24px, 4.75vmin, 72px)/1.2 EOSExportHeading, sans-serif;
+}
+.eos503-export-themed .eos503-export-body {
+  flex: 1 1 auto;
+  display: grid;
+  align-content: center;
+  margin: 0;
+  text-wrap: pretty;
+}
+.eos503-export-themed .eos503-export-status {
+  flex: 0 0 auto;
+  min-height: 1.4em;
+  margin: 0;
+  font-weight: 600;
+}
+.eos503-export-themed .eos503-export-actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+.eos503-export-themed .eos503-export-button {
+  flex: 1 1 220px;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 52px;
+  box-sizing: border-box;
+  border: 12px solid transparent !important;
+  border-image: url("export-theme/button.png") 69 59 61 59 fill / 12px !important;
+  background: transparent !important;
+  padding: 3px 8px !important;
+  margin: 0 !important;
+  color: #e5f6ee !important;
+  font: 400 clamp(14px, 2.125vmin, 32px)/1.2 EOSExportHeading, sans-serif !important;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+.eos503-export-themed .eos503-export-button:hover:not(:disabled),
+.eos503-export-themed .eos503-export-button:focus-visible {
+  border-image-source: url("export-theme/button-hover.png") !important;
+  outline: 2px solid #d3fff0;
+  outline-offset: 2px;
+}
+.eos503-export-themed .eos503-export-button:active:not(:disabled) {
+  border-image-source: url("export-theme/button-pressed.png") !important;
+}
+.eos503-export-themed .eos503-export-button:disabled {
+  opacity: .5;
+  cursor: default;
+}
+@media (max-height: 540px) {
+  .eos503-export-dialog.eos503-export-themed { gap: 6px; font-size: 15px !important; line-height: 1.3 !important; }
+  .eos503-export-themed .eos503-export-heading { font-size: 24px; }
+  .eos503-export-themed .eos503-export-button { min-height: 48px; border-width: 10px !important; border-image-width: 10px !important; font-size: 14px !important; }
+}
+@media (max-width: 520px) {
+  .eos503-export-themed .eos503-export-button { flex-basis: 100%; }
+}

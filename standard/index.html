@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | EOS-503</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <link rel="stylesheet" href="TemplateData/eos-export.css">
+    <script src="TemplateData/eos-export-theme.js"></script>
+  </head>
+  <body>
+    <div id="custom-bg"></div>
+    <div id="custom-logo"></div>
+    <div id="custom-loader">
+      <div class="fill"></div>
+      <div class="label">0%</div>
+    </div>
+
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas" width=1280 height=720></canvas>
+      <div id="unity-warning"> </div>
+      <div id="unity-footer">
+        <div id="unity-webgl-logo"></div>
+        <div id="unity-fullscreen-button"></div>
+        <div id="unity-build-title">EOS-503</div>
+      </div>
+    </div>
+	<script>
+      var container = document.querySelector("#unity-container");
+      var canvas = document.querySelector("#unity-canvas");
+      var fullscreenButton = document.querySelector("#unity-fullscreen-button");
+      var warningBanner = document.querySelector("#unity-warning");
+	  var customLoader = document.querySelector("#custom-loader");
+      var customLogo = document.querySelector("#custom-logo");
+      var customBg = document.querySelector("#custom-bg");
+      var customFill = document.querySelector("#custom-loader .fill");
+      var customLabel = document.querySelector("#custom-loader .label");
+
+      // Shows a temporary message banner/ribbon for a few seconds, or
+      // a permanent error message on top of the canvas if type=='error'.
+      // If type=='warning', a yellow highlight color is used.
+      // Modify or remove this function to customize the visually presented
+      // way that non-critical warnings and error messages are presented to the
+      // user.
+      function unityShowBanner(msg, type) {
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+        }
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        else {
+          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          setTimeout(function() {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
+        updateBannerVisibility();
+      }
+
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/Standard.loader.js";
+      var config = {
+        dataUrl: buildUrl + "/Standard.data",
+        frameworkUrl: buildUrl + "/Standard.framework.js",
+        codeUrl: buildUrl + "/Standard.wasm",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "PyrebugStudios",
+        productName: "EOS-503",
+        // Unity expands this triple-brace expression during the WebGL build.
+        // VS Code's JavaScript checker may flag the unexpanded Unity template syntax.
+        productVersion: "1.0.19",
+        showBanner: unityShowBanner,
+      };
+
+      // Unity's built-in default is `url == config.dataUrl ? "must-revalidate" : "no-store"`,
+      // so only the .data file is eligible for the loader's IndexedDB cache. That leaves the
+      // ~30 MB .wasm out of it, dependent on the host's HTTP caching alone - and GitHub Pages
+      // sends Cache-Control: max-age=600. A participant who reloads more than ten minutes
+      // after loading therefore re-fetches the whole .wasm. Observed 2026-09-17: on reload the
+      // 91 MB .data came back from IndexedDB instantly while the loading bar sat at ~90%, which
+      // is where downloads finish and WASM compile plus the first scene load begin.
+      //
+      // "must-revalidate" stores the file but still checks the ETag before using it, so a
+      // redeployed build is never served stale: the new build's ETag invalidates the entry.
+      // That property is what makes this safe to do mid-study.
+      //
+      // Matched by identity against the config URLs first, which is what Unity's own
+      // default does and is the only form that is agnostic to build naming: a renamed
+      // build, or one using the decompression fallback (.data.unityweb, .wasm.unityweb),
+      // still matches. The extension test is a fallback in case the loader ever hands us
+      // an absolute URL instead of the exact config string. .framework.js is deliberately
+      // left uncached: at ~400 KB it is not worth the cache surface.
+      config.cacheControl = function (url) {
+        if (url === config.dataUrl || url === config.codeUrl) return "must-revalidate";
+        if (/\.(data|wasm)(\.unityweb|\.gz|\.br)?$/.test(url)) return "must-revalidate";
+        return "no-store";
+      };
+
+      // By default Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile device style: fill the whole browser client area with the game canvas:
+
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+        container.className = "unity-mobile";
+        canvas.className = "unity-mobile";
+
+        // To lower canvas resolution on mobile devices to gain some
+        // performance, uncomment the following line:
+        // config.devicePixelRatio = 1;
+
+        unityShowBanner('WebGL builds are not supported on mobile devices.');
+      } else {
+        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
+
+        canvas.style.width = "1280px";
+        canvas.style.height = "720px";
+      }
+
+      // Keep failures visible above the custom loading overlay. A failed loader
+      // never calls createUnityInstance, so its Promise cannot report that error.
+      var loadingFailed = false;
+      function showLoadFailure() {
+        if (loadingFailed) return;
+        loadingFailed = true;
+        customLabel.textContent = "Loading failed";
+        var errorPanel = document.createElement("div");
+        errorPanel.setAttribute("role", "alert");
+        errorPanel.style.cssText = "position:fixed;inset:10% 8% auto;z-index:2147483647;background:#641c24;color:white;padding:24px;font:18px sans-serif;white-space:pre-wrap;overflow-wrap:anywhere;max-height:70vh;overflow:auto";
+        errorPanel.textContent = "EOS-503 could not load. Please reload the page. If this continues, contact the researcher with code EOS_STARTUP_FAILED.";
+        document.body.appendChild(errorPanel);
+        console.error("EOS-503 startup failed (EOS_STARTUP_FAILED).");
+      }
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onerror = () => showLoadFailure();
+      script.onload = () => {
+        try {
+          if (typeof createUnityInstance !== "function") {
+            showLoadFailure(); return;
+          }
+          createUnityInstance(canvas, config, (progress) => {
+          if (loadingFailed) return;
+          var percentage = Math.round(progress * 100);
+          customFill.style.width = percentage + "%";
+          customLabel.textContent = percentage + "%";
+        }).then((unityInstance) => {
+          customLoader.style.display = "none";
+          customLogo.style.display = "none";
+          if(customBg) customBg.style.display = "none";
+          fullscreenButton.onclick = () => {
+            if (typeof window.eosResearchFullscreenRequest === "function") {
+              try { window.eosResearchFullscreenRequest(); } catch (ignored) { }
+            }
+            unityInstance.SetFullscreen(1);
+          };
+          }).catch(showLoadFailure);
+        } catch (error) {
+          showLoadFailure();
+        }
+      };
+      document.body.appendChild(script);
+    </script>
+  </body>
+</html>

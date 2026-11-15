@@ -1,0 +1,44 @@
+{
+  "schema": "eos503-export-download-theme/v1",
+  "foundation": "Original EOS-503 panel/button artwork and fonts used by the credits UI",
+  "creditsIncluded": false,
+  "assets": [
+    {
+      "source": "EOS-503/Assets/_Sprites/OptionsUI/OptionsPanelUI.PNG",
+      "target": "TemplateData/export-theme/panel.png",
+      "sha256": "78c4abec97961cdfb7d57809cf5aa3df0d3d5f9113bdd7728126b5392866a583",
+      "bytes": 3130575
+    },
+    {
+      "source": "EOS-503/Assets/_Sprites/UI/Misc/NewButton.PNG",
+      "target": "TemplateData/export-theme/button.png",
+      "sha256": "ba443f2458a97fb71c4a29074773870013eaee2d8745f245334152ef3ffaf2f3",
+      "bytes": 47422
+    },
+    {
+      "source": "EOS-503/Assets/_Sprites/UI/Misc/NewButton_Highlight.PNG",
+      "target": "TemplateData/export-theme/button-hover.png",
+      "sha256": "50aa2099e5171d8691dfaf8bcde71846b039d722f142cb4bdc79c0ac3302f300",
+      "bytes": 65583
+    },
+    {
+      "source": "EOS-503/Assets/_Sprites/UI/Misc/NewButton_Pressed.PNG",
+      "target": "TemplateData/export-theme/button-pressed.png",
+      "sha256": "46b57d5363b5005db5ddf0188f31e266f71801de4ea1a96020fb25378d17930f",
+      "bytes": 47272
+    },
+    {
+      "source": "EOS-503/Assets/_Fonts/Audiowide-Regular.ttf",
+      "target": "TemplateData/export-theme/Audiowide-Regular.ttf",
+      "sha256": "434a720871336d359378beff5ebff3f9fd654d958693d272c7c6f2e271c7e41c",
+      "bytes": 47676
+    },
+    {
+      "source": "EOS-503/Assets/_RPGTALK/Fonts/Roboto/Roboto-Light.ttf",
+      "target": "TemplateData/export-theme/Roboto-Light.ttf",
+      "sha256": "db02096a91c20ab62d459001a1059bc8d78caa35d637dc91494c4440815a6ac1",
+      "bytes": 170012
+    }
+  ],
+  "qualification": "Byte-identical asset copies; download information only. Credits and developer names are excluded. Baked OPTIONS header is not reused."
+}
