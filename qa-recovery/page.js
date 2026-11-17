@@ -1,9 +1,10 @@
 'use strict';
 (async()=>{
  const api=window.EOSQaRecovery,pin=window.EOSQaRecoveryPin,$=id=>document.getElementById(id),status=$('status');let prepared=null,busy=false;
- const refresh=()=>{$('install').disabled=busy||!prepared||!$('closed').checked;$('restore').disabled=busy||!$('closed').checked;$('file').disabled=busy;$('closed').disabled=busy;};
+ const refresh=()=>{$('install').disabled=busy||!prepared||!$('closed').checked;$('restore').disabled=busy||!$('closed').checked;$('inspect').disabled=busy;$('file').disabled=busy;$('closed').disabled=busy;};
  if(!api.allowedLocation(location)){status.textContent='This tool only works on the separate EOS-503 test site.';return;}
  $('closed').addEventListener('change',refresh);
+ $('inspect').addEventListener('click',async()=>{busy=true;refresh();status.textContent='Checking the browser storage layout without reading or changing saved records...';try{const info=await api.inspect(indexedDB);status.textContent=info.compatible?info.code+': '+(info.version===null?'No test database exists yet. The import can create its normal storage.':'The test storage layout is compatible.'):'Browser storage check: '+info.code+' (database version '+info.version+', '+info.storeCount+' stores).\nExisting storage was preserved. Use a separate regular Chrome or Edge profile for this test. Do not clear your current profile or use Guest/Incognito.';}catch(e){status.textContent=e.message;}finally{busy=false;refresh();}});
  $('file').addEventListener('change',async()=>{
   prepared=null;$('games').hidden=true;busy=true;refresh();status.textContent='Checking the prepared QA file...';
   try{const file=$('file').files[0];if(!file||file.size>20000000)throw Error('Select the prepared .eos503qa file.');prepared=await api.validate(await file.text(),pin,crypto.subtle);status.textContent='Completed 99990001 run verified: 10,186 rows. Confirm the game tabs are closed, then load the history.';}catch(e){status.textContent=e.message;}finally{busy=false;refresh();}
