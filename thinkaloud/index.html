@@ -62,17 +62,21 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/ThinkAloud.loader.js";
+      // Unity expands the version safely as a JavaScript string. Use the same
+      // identity on all four requests: the DOM-loaded loader/framework scripts
+      // do not use config.cacheControl's IndexedDB revalidation policy.
+      var buildVersion = "1.0.23";
+      var buildIdentity = "?build=" + encodeURIComponent(buildVersion);
+      var loaderUrl = buildUrl + "/ThinkAloud.loader.js" + buildIdentity;
       var config = {
-        dataUrl: buildUrl + "/ThinkAloud.data",
-        frameworkUrl: buildUrl + "/ThinkAloud.framework.js",
-        codeUrl: buildUrl + "/ThinkAloud.wasm",
+        dataUrl: buildUrl + "/ThinkAloud.data" + buildIdentity,
+        frameworkUrl: buildUrl + "/ThinkAloud.framework.js" + buildIdentity,
+        codeUrl: buildUrl + "/ThinkAloud.wasm" + buildIdentity,
         streamingAssetsUrl: "StreamingAssets",
         companyName: "PyrebugStudios",
         productName: "EOS-503",
-        // Unity expands this triple-brace expression during the WebGL build.
-        // VS Code's JavaScript checker may flag the unexpanded Unity template syntax.
-        productVersion: "1.0.20",
+        // Report the same release identity used by the asset request URLs.
+        productVersion: buildVersion,
         showBanner: unityShowBanner,
       };
 
@@ -84,19 +88,21 @@
       // 91 MB .data came back from IndexedDB instantly while the loading bar sat at ~90%, which
       // is where downloads finish and WASM compile plus the first scene load begin.
       //
-      // "must-revalidate" stores the file but still checks the ETag before using it, so a
-      // redeployed build is never served stale: the new build's ETag invalidates the entry.
-      // That property is what makes this safe to do mid-study.
+      // "must-revalidate" asks the Unity cache to check its stored response before reuse.
+      // Unique release versions also separate these request keys from earlier builds.
+      // This does not guarantee freshness of the HTML document or atomic deployment;
+      // hosted build identity still requires independent verification.
       //
       // Matched by identity against the config URLs first, which is what Unity's own
       // default does and is the only form that is agnostic to build naming: a renamed
       // build, or one using the decompression fallback (.data.unityweb, .wasm.unityweb),
       // still matches. The extension test is a fallback in case the loader ever hands us
-      // an absolute URL instead of the exact config string. .framework.js is deliberately
-      // left uncached: at ~400 KB it is not worth the cache surface.
+      // an absolute URL instead of the exact config string. The framework stays outside
+      // Unity's IndexedDB cache; its HTTP request uses the versioned key above.
       config.cacheControl = function (url) {
         if (url === config.dataUrl || url === config.codeUrl) return "must-revalidate";
-        if (/\.(data|wasm)(\.unityweb|\.gz|\.br)?$/.test(url)) return "must-revalidate";
+        var pathWithoutQuery = String(url).split(/[?#]/)[0];
+        if (/\.(data|wasm)(\.unityweb|\.gz|\.br)?$/.test(pathWithoutQuery)) return "must-revalidate";
         return "no-store";
       };
 
