@@ -1,0 +1,70 @@
+.eos-download-guide {
+    flex: 0 0 auto;
+    align-self: center;
+    max-width: 55rem;
+}
+
+.eos-download-guide-filename {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: center;
+    gap: .5rem;
+}
+
+.eos-download-guide-filename label { min-width: 0; text-align: left; }
+.eos-download-guide-name {
+    display: block;
+    box-sizing: border-box;
+    width: min(19ch, 100%);
+    padding: .35rem .55rem;
+    border: 1px solid #8fb9bc;
+    border-radius: .25rem;
+    background: #182a44;
+    color: #effaf8;
+    font: 1em ui-monospace, monospace;
+}
+
+.eos-download-guide-instructions, .eos-download-guide-copy-status {
+    margin: .35rem 0 0;
+    font-size: .85em;
+}
+
+.eos-download-guide-control, #unity-container #unity-footer .eos-download-guide-control {
+    box-sizing: border-box;
+    padding: .35rem .65rem;
+    border: 1px solid #8fb9bc;
+    border-radius: .3rem;
+    background: #182a44;
+    color: #effaf8;
+    font: 600 .875rem/1.25 system-ui, sans-serif;
+    cursor: pointer;
+}
+
+.eos-download-guide-control:hover { background: #22415b; }
+.eos-download-guide-control:focus-visible, .eos-download-guide-name:focus-visible {
+    outline: 2px solid #c7fff5;
+    outline-offset: 2px;
+}
+
+#unity-container #unity-footer .eos-download-guide-test { margin-left: .5rem; }
+
+#unity-container #unity-footer .eos-download-guide-test-notice {
+    position: absolute;
+    z-index: 10;
+    left: .5rem;
+    bottom: 46px;
+    max-width: min(30rem, calc(100% - 1rem));
+    box-sizing: border-box;
+    padding: .6rem .8rem;
+    border: 1px solid #8fb9bc;
+    border-radius: .3rem;
+    background: #182a44;
+    color: #effaf8;
+    font: .875rem/1.4 system-ui, sans-serif;
+    pointer-events: none;
+}
+
+@media (max-width: 520px) {
+    #unity-container #unity-footer #unity-webgl-logo { display: none; }
+}
